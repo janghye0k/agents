@@ -1,0 +1,38 @@
+{
+  "mcpServers": {
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    "serena": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "D:/servers/serena-mcp",
+        "serena-mcp-server",
+        "--context",
+        "ide",
+        "--project",
+        "${workspaceFolder}",
+        "--enable-web-dashboard",
+        "false"
+      ]
+    },
+    "filesystem": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "--mount",
+        "type=bind,src=${workspaceFolder},dst=/projects/workspace",
+        "mcp/filesystem",
+        "/projects"
+      ]
+    }
+  }
+}

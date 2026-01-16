@@ -1,0 +1,394 @@
+---
+description: Integration guide for Serena MCP tools with isolation_rules Memory Bank system
+globs: serena-integration.mdc
+alwaysApply: false
+---
+
+# SERENA MCP & ISOLATION_RULES 통합 가이드
+
+> **TL;DR:** Serena MCP의 심볼 기반 코드 탐색 및 편집 도구를 isolation_rules의 Memory Bank 시스템과 통합하여 토큰 효율성과 코드 품질을 동시에 향상시킵니다.
+
+## 🎯 통합 목표
+
+1. **토큰 효율성 극대화**: Serena의 심볼 기반 탐색 + isolation_rules의 계층적 규칙 로딩
+2. **코드 품질 향상**: 구조화된 워크플로우 + 정밀한 심볼 편집
+3. **컨텍스트 보존**: Memory Bank + Serena 메모리 시스템 통합
+4. **자동화된 워크플로우**: 모드 전환 시 Serena 도구 자동 활용
+
+## 🔄 통합 아키텍처
+
+```mermaid
+graph TD
+    subgraph "Memory Bank System"
+        MB["Memory Bank<br/>Files"]
+        Tasks["tasks.md"]
+        Context["activeContext.md"]
+        Progress["progress.md"]
+    end
+
+    subgraph "Serena MCP Tools"
+        Symbol["Symbol Tools"]
+        Memory["Memory Tools"]
+        Search["Search Tools"]
+    end
+
+    subgraph "Isolation Rules Modes"
+        VAN["VAN Mode"]
+        PLAN["PLAN Mode"]
+        CREATIVE["CREATIVE Mode"]
+        BUILD["BUILD Mode"]
+        REFLECT["REFLECT Mode"]
+        ARCHIVE["ARCHIVE Mode"]
+    end
+
+    MB --> Symbol
+    MB --> Memory
+    Symbol --> BUILD
+    Memory --> ARCHIVE
+    Search --> PLAN
+    Search --> CREATIVE
+
+    VAN --> Symbol
+    PLAN --> Search
+    CREATIVE --> Search
+    BUILD --> Symbol
+    REFLECT --> Memory
+    ARCHIVE --> Memory
+```
+
+## 📋 모드별 Serena 도구 활용 전략
+
+### VAN Mode (초기화)
+
+**Serena 도구 사용:**
+
+- `check_onboarding_performed`: 프로젝트 온보딩 상태 확인
+- `onboarding`: Memory Bank 초기화와 함께 프로젝트 온보딩 수행
+- `list_dir`: 프로젝트 구조 파악
+- `find_file`: 핵심 파일 위치 확인
+
+**통합 워크플로우:**
+
+```markdown
+1. VAN 모드 시작
+2. Serena onboarding 확인 → Memory Bank 존재 확인
+3. 프로젝트 구조 탐색 (Serena list_dir)
+4. 복잡도 결정 (isolation_rules)
+5. Memory Bank 초기화 (isolation_rules)
+6. Serena 메모리에 프로젝트 컨텍스트 저장
+```
+
+### PLAN Mode (계획)
+
+**Serena 도구 사용:**
+
+- `get_symbols_overview`: 관련 컴포넌트/모듈 개요 파악
+- `find_symbol`: 계획에 필요한 심볼 식별
+- `find_referencing_symbols`: 의존성 분석
+- `search_for_pattern`: 관련 패턴 검색
+
+**통합 워크플로우:**
+
+```markdown
+1. PLAN 모드 시작
+2. 작업 범위 파악 (Serena get_symbols_overview)
+3. 영향받는 심볼 식별 (Serena find_symbol)
+4. 의존성 분석 (Serena find_referencing_symbols)
+5. Memory Bank tasks.md에 계획 저장
+6. Serena 메모리에 기술적 결정사항 저장
+```
+
+### CREATIVE Mode (설계)
+
+**Serena 도구 사용:**
+
+- `get_symbols_overview`: 기존 아키텍처 파악
+- `find_symbol`: 참고할 기존 구현 탐색
+- `search_for_pattern`: 유사 패턴 검색
+- `read_memory`: 이전 설계 결정사항 확인
+
+**통합 워크플로우:**
+
+```markdown
+1. CREATIVE 모드 시작
+2. 기존 아키텍처 분석 (Serena get_symbols_overview)
+3. 유사 패턴 검색 (Serena search_for_pattern)
+4. 이전 설계 결정 확인 (Serena read_memory)
+5. 설계 결정 문서화 (Memory Bank creative/\*.md)
+6. Serena 메모리에 설계 패턴 저장
+```
+
+### BUILD Mode (구현)
+
+**Serena 도구 사용:**
+
+- `find_symbol`: 편집할 심볼 식별
+- `replace_symbol_body`: 심볼 전체 교체
+- `insert_after_symbol`: 심볼 뒤에 코드 추가
+- `insert_before_symbol`: 심볼 앞에 코드 추가
+- `replace_content`: 부분 코드 수정
+- `find_referencing_symbols`: 영향받는 참조 확인
+
+**통합 워크플로우:**
+
+```markdown
+1. BUILD 모드 시작
+2. 구현할 심볼 식별 (Serena find_symbol)
+3. 심볼 기반 편집 수행 (Serena replace_symbol_body 등)
+4. 참조 업데이트 확인 (Serena find_referencing_symbols)
+5. Memory Bank progress.md 업데이트
+6. 테스트 및 검증
+```
+
+### REFLECT Mode (검토)
+
+**Serena 도구 사용:**
+
+- `find_referencing_symbols`: 변경사항 영향 범위 확인
+- `get_symbols_overview`: 전체 구조 검토
+- `read_memory`: 이전 작업과 비교
+
+**통합 워크플로우:**
+
+```markdown
+1. REFLECT 모드 시작
+2. 변경사항 영향 범위 분석 (Serena find_referencing_symbols)
+3. 코드 품질 검토 (Serena get_symbols_overview)
+4. Memory Bank reflection/\*.md 작성
+5. 개선사항 도출
+```
+
+### ARCHIVE Mode (문서화)
+
+**Serena 도구 사용:**
+
+- `read_memory`: Serena 메모리에서 컨텍스트 수집
+- `list_dir`: 생성된 파일 목록 확인
+
+**통합 워크플로우:**
+
+```markdown
+1. ARCHIVE 모드 시작
+2. Memory Bank 파일들 통합
+3. Serena 메모리에서 추가 컨텍스트 수집
+4. 최종 아카이브 문서 생성 (Memory Bank archive/\*.md)
+5. Serena 메모리 정리 (선택적)
+```
+
+## 🔗 메모리 시스템 통합
+
+### Memory Bank ↔ Serena Memory 매핑
+
+| Memory Bank 파일    | Serena Memory 이름   | 용도                 |
+| ------------------- | -------------------- | -------------------- |
+| `tasks.md`          | `current-task`       | 현재 작업 추적       |
+| `activeContext.md`  | `active-context`     | 활성 컨텍스트        |
+| `systemPatterns.md` | `system-patterns`    | 시스템 패턴          |
+| `techContext.md`    | `tech-context`       | 기술 컨텍스트        |
+| `creative/*.md`     | `creative-[feature]` | 설계 결정사항        |
+| `archive/*.md`      | `archive-[task-id]`  | 완료된 작업 아카이브 |
+
+### 통합 전략
+
+**1. 이중 저장 전략 (중요 정보)**
+
+```markdown
+- Memory Bank: 구조화된 워크플로우 문서
+- Serena Memory: 빠른 검색 및 참조용 요약
+```
+
+**2. 단일 저장 전략 (일시적 정보)**
+
+```markdown
+- Memory Bank만 사용: tasks.md, progress.md (작업 중인 내용)
+- Serena Memory만 사용: 임시 노트, 빠른 참조 정보
+```
+
+**3. 동기화 규칙**
+
+```markdown
+- 모드 전환 시: Memory Bank → Serena Memory 동기화
+- 작업 완료 시: Serena Memory → Memory Bank 아카이브
+- 주기적 정리: 오래된 Serena Memory 삭제
+```
+
+## 🛠️ 구체적 통합 예시
+
+### 예시 1: BUILD 모드에서 컴포넌트 수정
+
+````markdown
+## BUILD 모드: UserProfile 컴포넌트 수정
+
+1. **심볼 식별** (Serena)
+   ```typescript
+   find_symbol("UserProfile", include_body=true)
+   ```
+````
+
+2. **의존성 확인** (Serena)
+
+   ```typescript
+   find_referencing_symbols("UserProfile", "src/domains/user/ui/UserProfile.tsx")
+   ```
+
+3. **수정 수행** (Serena)
+
+   ```typescript
+   replace_symbol_body("UserProfile", "src/domains/user/ui/UserProfile.tsx", newBody)
+   ```
+
+4. **진행 상황 업데이트** (Memory Bank)
+
+   ```markdown
+   progress.md에 UserProfile 수정 완료 기록
+   ```
+
+5. **메모리 저장** (Serena, 선택적)
+   ```typescript
+   write_memory("user-profile-update", "UserProfile 컴포넌트에 새로운 prop 추가")
+   ```
+
+````
+
+### 예시 2: CREATIVE 모드에서 아키텍처 설계
+
+```markdown
+## CREATIVE 모드: 새로운 인증 시스템 설계
+
+1. **기존 구현 파악** (Serena)
+   ```typescript
+   get_symbols_overview("src/domains/auth")
+   find_symbol("AuthGuard")
+   search_for_pattern("authentication|auth|login")
+````
+
+2. **이전 설계 확인** (Serena Memory)
+
+   ```typescript
+   read_memory("auth-system-design")
+   ```
+
+3. **설계 결정 문서화** (Memory Bank)
+
+   ```markdown
+   creative/creative-auth-system.md 작성
+   ```
+
+4. **설계 패턴 저장** (Serena Memory)
+   ```typescript
+   write_memory("auth-system-patterns", "JWT 기반 인증, AuthGuard 패턴 사용")
+   ```
+
+````
+
+## ⚡ 토큰 효율성 최적화
+
+### 1. 심볼 기반 읽기 전략
+
+**❌ 비효율적 (전체 파일 읽기)**
+```typescript
+read_file("src/domains/user/ui/UserProfile.tsx") // 전체 파일 읽음
+````
+
+**✅ 효율적 (심볼 기반 읽기)**
+
+```typescript
+get_symbols_overview("src/domains/user/ui/UserProfile.tsx") // 개요만
+find_symbol("UserProfile", include_body=true) // 필요한 심볼만
+```
+
+### 2. 계층적 규칙 로딩 + 심볼 탐색
+
+**통합 전략:**
+
+- isolation_rules: 필요한 규칙만 로드
+- Serena: 필요한 심볼만 탐색
+- 결과: 최소 토큰 사용으로 최대 정보 획득
+
+### 3. 메모리 캐싱 전략
+
+```markdown
+1. 첫 탐색: 심볼 정보를 Serena Memory에 저장
+2. 재사용: Memory에서 읽기 (파일 읽기 스킵)
+3. 무효화: 파일 변경 시 Memory 삭제
+```
+
+## 📊 통합 체크리스트
+
+### VAN Mode 통합
+
+- [ ] Serena onboarding 확인
+- [ ] Memory Bank 초기화
+- [ ] 프로젝트 구조 파악 (Serena list_dir)
+- [ ] 복잡도 결정
+- [ ] 초기 컨텍스트 저장 (Serena Memory)
+
+### PLAN Mode 통합
+
+- [ ] 관련 심볼 개요 파악 (Serena get_symbols_overview)
+- [ ] 의존성 분석 (Serena find_referencing_symbols)
+- [ ] 계획 문서화 (Memory Bank tasks.md)
+- [ ] 기술 결정 저장 (Serena Memory)
+
+### CREATIVE Mode 통합
+
+- [ ] 기존 아키텍처 분석 (Serena)
+- [ ] 유사 패턴 검색 (Serena search_for_pattern)
+- [ ] 설계 결정 문서화 (Memory Bank creative/\*.md)
+- [ ] 패턴 저장 (Serena Memory)
+
+### BUILD Mode 통합
+
+- [ ] 심볼 기반 편집 (Serena replace_symbol_body 등)
+- [ ] 참조 업데이트 확인 (Serena find_referencing_symbols)
+- [ ] 진행 상황 업데이트 (Memory Bank progress.md)
+- [ ] 변경사항 요약 저장 (Serena Memory, 선택적)
+
+### REFLECT Mode 통합
+
+- [ ] 영향 범위 분석 (Serena find_referencing_symbols)
+- [ ] 코드 품질 검토 (Serena get_symbols_overview)
+- [ ] 검토 문서 작성 (Memory Bank reflection/\*.md)
+- [ ] 개선사항 도출
+
+### ARCHIVE Mode 통합
+
+- [ ] Memory Bank 파일 통합
+- [ ] Serena Memory에서 추가 컨텍스트 수집
+- [ ] 최종 아카이브 생성 (Memory Bank archive/\*.md)
+- [ ] 불필요한 Serena Memory 정리
+
+## 🚨 주의사항
+
+1. **파일 읽기 vs 심볼 읽기**
+   - 전체 파일을 읽은 경우: Serena 심볼 도구 사용 불필요 (이미 정보 있음)
+   - 부분 정보만 필요한 경우: 항상 Serena 심볼 도구 우선 사용
+
+2. **메모리 중복 방지**
+   - Memory Bank와 Serena Memory에 동일 정보 중복 저장 지양
+   - 각각의 목적에 맞게 분리 저장
+
+3. **모드 전환 시 컨텍스트 보존**
+   - Memory Bank activeContext.md 업데이트
+   - 필요한 경우 Serena Memory에도 요약 저장
+
+4. **토큰 효율성 우선순위**
+   - 1순위: Serena 심볼 도구 (최소 토큰)
+   - 2순위: 파일 부분 읽기
+   - 3순위: 전체 파일 읽기 (최후의 수단)
+
+## 📈 예상 효과
+
+1. **토큰 사용량 감소**: 40-60% 감소 (심볼 기반 탐색 + 계층적 규칙 로딩)
+2. **코드 품질 향상**: 정밀한 심볼 편집으로 부작용 최소화
+3. **워크플로우 효율성**: 구조화된 프로세스 + 자동화된 도구 활용
+4. **컨텍스트 보존**: 이중 메모리 시스템으로 정보 손실 방지
+
+## 🔄 지속적 개선
+
+통합 시스템은 지속적으로 개선되어야 합니다:
+
+1. **사용 패턴 분석**: 어떤 조합이 가장 효율적인지 추적
+2. **토큰 사용 모니터링**: 각 모드별 토큰 사용량 측정
+3. **워크플로우 최적화**: 빈번한 작업 자동화
+4. **도구 확장**: 필요에 따라 새로운 통합 포인트 추가

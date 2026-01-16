@@ -1,0 +1,5 @@
+---
+alwaysApply: true
+---
+
+날짜를 가져올때는 Get-Date를 사용한다.

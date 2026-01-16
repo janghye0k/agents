@@ -1,0 +1,416 @@
+---
+description: Practical examples of using Serena MCP tools within isolation_rules workflow
+globs: serena-integration-examples.mdc
+alwaysApply: false
+---
+
+# SERENA MCP 통합 실전 예시
+
+이 문서는 isolation_rules 워크플로우에서 Serena MCP 도구를 실제로 사용하는 구체적인 예시를 제공합니다.
+
+## 📝 예시 1: BUILD 모드에서 컴포넌트 수정
+
+### 시나리오
+
+`UserProfile` 컴포넌트에 새로운 prop을 추가하고 관련 로직을 수정해야 합니다.
+
+### 단계별 실행
+
+#### 1단계: 심볼 개요 파악 (토큰 효율적)
+
+```typescript
+// ❌ 비효율적: 전체 파일 읽기
+read_file("src/domains/user/ui/UserProfile.tsx")
+
+// ✅ 효율적: 심볼 개요만 확인
+get_symbols_overview("src/domains/user/ui/UserProfile.tsx")
+```
+
+**결과:**
+
+- 컴포넌트 구조 파악
+- 필요한 메서드/프로퍼티 식별
+- 전체 파일 읽기 불필요
+
+#### 2단계: 정확한 심볼 찾기
+
+```typescript
+// UserProfile 컴포넌트의 정의 찾기
+find_symbol("UserProfile", {
+  relative_path: "src/domains/user/ui/UserProfile.tsx",
+  include_body: true
+})
+```
+
+#### 3단계: 의존성 확인
+
+```typescript
+// UserProfile을 사용하는 모든 곳 찾기
+find_referencing_symbols("UserProfile", "src/domains/user/ui/UserProfile.tsx")
+```
+
+**확인 사항:**
+
+- 어디서 UserProfile이 사용되는지
+- 새로운 prop이 breaking change를 일으키는지
+- 업데이트가 필요한 참조
+
+#### 4단계: 심볼 기반 수정
+
+```typescript
+// 컴포넌트 전체 교체 (새로운 prop 추가)
+replace_symbol_body(
+  "UserProfile",
+  "src/domains/user/ui/UserProfile.tsx",
+  newComponentBody
+)
+```
+
+#### 5단계: 참조 업데이트 (필요시)
+
+```typescript
+// 각 참조 위치에서 새로운 prop 추가
+// find_referencing_symbols로 찾은 위치들을 순회하며 업데이트
+```
+
+#### 6단계: Memory Bank 업데이트
+
+```markdown
+# progress.md에 기록
+
+- [x] UserProfile 컴포넌트에 `showEmail` prop 추가
+- [x] 관련 참조 3곳 업데이트
+```
+
+### 토큰 사용 비교
+
+| 방법                  | 토큰 사용량      | 효율성 |
+| --------------------- | ---------------- | ------ |
+| 전체 파일 읽기 + 수정 | ~5,000           | 낮음   |
+| 심볼 기반 접근        | ~1,500           | 높음   |
+| **절감량**            | **~3,500 (70%)** | -      |
+
+---
+
+## 📝 예시 2: CREATIVE 모드에서 아키텍처 설계
+
+### 시나리오
+
+새로운 인증 시스템을 설계해야 합니다. 기존 구현을 참고하고 패턴을 파악해야 합니다.
+
+### 단계별 실행
+
+#### 1단계: 도메인 구조 파악
+
+```typescript
+// 인증 관련 도메인 전체 개요
+get_symbols_overview("src/domains/auth", { depth: 1 })
+```
+
+**결과:**
+
+- 인증 관련 컴포넌트 목록
+- 주요 함수/클래스 식별
+- 전체 구조 이해
+
+#### 2단계: 기존 패턴 검색
+
+```typescript
+// 인증 관련 패턴 검색
+search_for_pattern("authentication|auth|login|jwt|token", {
+  relative_path: "src/domains/auth",
+  restrict_search_to_code_files: true
+})
+```
+
+#### 3단계: 핵심 심볼 분석
+
+```typescript
+// AuthGuard 컴포넌트 분석
+find_symbol("AuthGuard", {
+  relative_path: "src/domains/auth",
+  include_body: true,
+  depth: 1  // 메서드도 함께 확인
+})
+```
+
+#### 4단계: 이전 설계 확인
+
+```typescript
+// 이전에 저장한 설계 결정 확인
+read_memory("auth-system-design")
+read_memory("auth-system-patterns")
+```
+
+#### 5단계: 설계 결정 문서화
+
+```markdown
+# Memory Bank: creative/creative-auth-system.md 작성
+
+## 설계 결정
+
+- JWT 기반 인증 채택
+- AuthGuard 패턴 재사용
+- 기존 useAuth 훅 확장
+```
+
+#### 6단계: 패턴 저장
+
+```typescript
+// Serena Memory에 설계 패턴 저장 (빠른 참조용)
+write_memory("auth-system-patterns", `
+- JWT 토큰 기반 인증
+- AuthGuard HOC 패턴 사용
+- useAuth 훅으로 상태 관리
+- 토큰 갱신 자동화
+`)
+```
+
+### 토큰 사용 비교
+
+| 방법             | 토큰 사용량       | 효율성    |
+| ---------------- | ----------------- | --------- |
+| 전체 파일들 읽기 | ~15,000           | 매우 낮음 |
+| 심볼 기반 탐색   | ~3,000            | 높음      |
+| **절감량**       | **~12,000 (80%)** | -         |
+
+---
+
+## 📝 예시 3: PLAN 모드에서 영향 범위 분석
+
+### 시나리오
+
+`useUser` 훅을 수정하려고 합니다. 어떤 컴포넌트들이 영향을 받는지 확인해야 합니다.
+
+### 단계별 실행
+
+#### 1단계: 훅 정의 확인
+
+```typescript
+// useUser 훅의 현재 구현 확인
+find_symbol("useUser", {
+  include_body: true
+})
+```
+
+#### 2단계: 모든 참조 찾기
+
+```typescript
+// useUser를 사용하는 모든 곳 찾기
+find_referencing_symbols("useUser", "src/domains/user/hooks/useUser.ts")
+```
+
+**결과:**
+
+- 15개 컴포넌트에서 사용 중
+- 3개 유틸리티 함수에서 사용 중
+- 총 18개 위치 업데이트 필요
+
+#### 3단계: 영향받는 컴포넌트 개요
+
+```typescript
+// 각 참조 위치의 심볼 개요 확인 (파일 읽기 없이)
+// find_referencing_symbols 결과에서 각 파일의 심볼 개요 확인
+```
+
+#### 4단계: 계획 수립
+
+```markdown
+# Memory Bank: tasks.md에 기록
+
+## useUser 훅 수정 계획
+
+### 영향 범위
+
+- 15개 컴포넌트
+- 3개 유틸리티 함수
+
+### 수정 단계
+
+1. useUser 훅 수정
+2. 타입 정의 업데이트
+3. 영향받는 컴포넌트 순차 업데이트
+4. 테스트
+```
+
+#### 5단계: 기술 결정 저장
+
+```typescript
+// Serena Memory에 영향 범위 요약 저장
+write_memory("useuser-refactor-scope", `
+useUser 훅 수정 영향 범위:
+- 15개 컴포넌트
+- 3개 유틸리티 함수
+- 주요 영향: UserProfile, UserList, UserSettings
+`)
+```
+
+### 토큰 사용 비교
+
+| 방법           | 토큰 사용량       | 효율성    |
+| -------------- | ----------------- | --------- |
+| 모든 파일 읽기 | ~25,000           | 매우 낮음 |
+| 심볼 기반 분석 | ~4,000            | 높음      |
+| **절감량**     | **~21,000 (84%)** | -         |
+
+---
+
+## 📝 예시 4: REFLECT 모드에서 코드 품질 검토
+
+### 시나리오
+
+작업 완료 후 코드 품질과 영향 범위를 검토해야 합니다.
+
+### 단계별 실행
+
+#### 1단계: 변경된 심볼 확인
+
+```typescript
+// 수정한 주요 심볼들의 개요 확인
+get_symbols_overview("src/domains/user/ui/UserProfile.tsx")
+get_symbols_overview("src/domains/user/hooks/useUser.ts")
+```
+
+#### 2단계: 참조 무결성 확인
+
+```typescript
+// 수정한 심볼들의 참조가 올바른지 확인
+find_referencing_symbols("UserProfile", "src/domains/user/ui/UserProfile.tsx")
+find_referencing_symbols("useUser", "src/domains/user/hooks/useUser.ts")
+```
+
+#### 3단계: 패턴 일관성 확인
+
+```typescript
+// 유사한 패턴이 일관되게 적용되었는지 확인
+search_for_pattern("useUser|UserProfile", {
+  restrict_search_to_code_files: true
+})
+```
+
+#### 4단계: 검토 문서 작성
+
+```markdown
+# Memory Bank: reflection/reflection-[task-id].md
+
+## 코드 품질 검토
+
+- ✅ 모든 참조 업데이트 완료
+- ✅ 타입 안정성 유지
+- ✅ 기존 패턴 준수
+- ⚠️ 성능 최적화 여지 있음 (향후 개선)
+```
+
+### 토큰 사용 비교
+
+| 방법             | 토큰 사용량      | 효율성 |
+| ---------------- | ---------------- | ------ |
+| 전체 파일 재읽기 | ~10,000          | 낮음   |
+| 심볼 기반 검토   | ~2,000           | 높음   |
+| **절감량**       | **~8,000 (80%)** | -      |
+
+---
+
+## 🎯 베스트 프랙티스 요약
+
+### ✅ DO (권장)
+
+1. **심볼 기반 탐색 우선**
+
+   ```typescript
+   // 항상 먼저 시도
+   get_symbols_overview() → find_symbol() → 필요한 경우에만 파일 읽기
+   ```
+
+2. **점진적 정보 수집**
+
+   ```typescript
+   // 개요 → 심볼 → 본문 순서로
+   get_symbols_overview()  // 1단계: 구조 파악
+   find_symbol(include_body=false)  // 2단계: 심볼 식별
+   find_symbol(include_body=true)  // 3단계: 필요한 심볼만 상세 확인
+   ```
+
+3. **메모리 활용**
+
+   ```typescript
+   // 자주 참조하는 정보는 메모리에 저장
+   write_memory("key-info", summary)
+   // 나중에 빠르게 참조
+   read_memory("key-info")
+   ```
+
+4. **의존성 분석 먼저**
+   ```typescript
+   // 수정 전에 항상 영향 범위 확인
+   find_referencing_symbols() → 영향 범위 파악 → 수정 계획 수립
+   ```
+
+### ❌ DON'T (비권장)
+
+1. **전체 파일 읽기 남용**
+
+   ```typescript
+   // ❌ 작은 수정을 위해 전체 파일 읽기
+   read_file("huge-component.tsx")  // 500줄 파일 전체 읽기
+
+   // ✅ 필요한 심볼만 읽기
+   find_symbol("SpecificMethod", include_body=true)
+   ```
+
+2. **중복 정보 저장**
+
+   ```typescript
+   // ❌ Memory Bank와 Serena Memory에 동일 정보 중복
+   // ✅ 각각의 목적에 맞게 분리 저장
+   ```
+
+3. **심볼 도구 무시**
+   ```typescript
+   // ❌ 이미 파일을 읽었는데 심볼 도구 또 사용
+   // ✅ 파일을 읽었다면 그 정보 활용
+   ```
+
+---
+
+## 📊 통합 효과 측정
+
+### 토큰 사용량 비교 (평균)
+
+| 작업 유형      | 기존 방식  | Serena 통합 | 절감률   |
+| -------------- | ---------- | ----------- | -------- |
+| 컴포넌트 수정  | 5,000      | 1,500       | 70%      |
+| 아키텍처 설계  | 15,000     | 3,000       | 80%      |
+| 영향 범위 분석 | 25,000     | 4,000       | 84%      |
+| 코드 검토      | 10,000     | 2,000       | 80%      |
+| **평균**       | **13,750** | **2,625**   | **~81%** |
+
+### 작업 효율성 향상
+
+- **코드 탐색 시간**: 60% 감소
+- **정확도**: 심볼 기반 편집으로 오류 감소
+- **컨텍스트 보존**: 이중 메모리 시스템으로 정보 손실 방지
+- **워크플로우 일관성**: 구조화된 프로세스 유지
+
+---
+
+## 🔄 실전 워크플로우 체크리스트
+
+작업 시작 전:
+
+- [ ] Serena onboarding 확인
+- [ ] Memory Bank 초기화 확인
+- [ ] 관련 메모리 확인 (read_memory)
+
+작업 중:
+
+- [ ] 심볼 기반 탐색 우선 사용
+- [ ] 전체 파일 읽기 최소화
+- [ ] 진행 상황 Memory Bank에 기록
+- [ ] 중요한 결정사항 Serena Memory에 저장
+
+작업 완료 후:
+
+- [ ] Memory Bank 최종 업데이트
+- [ ] Serena Memory 정리 (불필요한 것 삭제)
+- [ ] 검토 및 아카이브
