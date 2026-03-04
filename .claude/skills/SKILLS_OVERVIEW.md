@@ -4,7 +4,7 @@
 
 ## 📊 통계
 
-- **현재 로컬 폴더 Skills 수**: 30개 (document-skills의 4개 하위 skills 포함 시 33개)
+- **현재 로컬 폴더 Skills 수**: 34개 (document-skills의 4개 하위 skills 포함 시 37개)
 - **카테고리별 분류**: 8개 카테고리
 
 ---
@@ -80,6 +80,13 @@
 
 ## 📝 Communication & Writing (커뮤니케이션 및 작성)
 
+### beautiful_prose
+
+- **설명**: 현대 AI식 표현 없이, 깔끔하고 정확하며 힘 있는 영어 산문을 위한 스타일 계약. 구체적이고 동사 중심이며, 필러·치유 톤을 배제합니다.
+- **용도**: 산문 작성·교정 요청 시, AI 틱·과장·모호함 없이 깔끔하고 강한 문체가 필요할 때
+- **특징**: REGISTER/DENSITY/HEAT/LENGTH 등 옵션 태그 지원, 금지 패턴(em dash, 특정 어휘·구문) 명시
+- **활성화**: "Apply the Beautiful Prose skill." 등으로 요청 시 적용
+
 ### brainstorming
 
 - **설명**: 모든 창의적 작업 전에 사용해야 합니다. 기능 생성, 구성 요소 구축, 기능 추가 또는 동작 수정 전에 사용자 의도, 요구사항 및 디자인을 탐색합니다.
@@ -135,6 +142,26 @@
 ---
 
 ## 🔧 Development & Technical (개발 및 기술)
+
+### react-best-practices
+
+- **설명**: Vercel Engineering의 React 및 Next.js 성능 최적화 가이드. React/Next.js 코드 작성, 리뷰, 리팩토링 시 최적의 성능 패턴을 적용합니다.
+
+### supabase-postgres-best-practices
+
+- **설명**: Supabase의 Postgres 성능 최적화 및 모범 사례. 쿼리·스키마·DB 설정 작성·리뷰·최적화 시 적용합니다.
+- **용도**: SQL 쿼리 작성·스키마 설계, 인덱스·쿼리 최적화, DB 성능 이슈 리뷰, 연결 풀·스케일링 설정, RLS 등 Postgres 기능 최적화
+- **특징**: 8개 카테고리(쿼리 성능, 연결 관리, 보안·RLS, 스키마 설계, 동시성·락, 데이터 접근, 모니터링, 고급 기능), 잘못된/올바른 SQL 예시·쿼리 플랜 분석
+- **출처**: Supabase
+- **용도**: React 컴포넌트·Next.js 페이지 작성, 데이터 페칭, 번들 최적화, 성능 개선
+- **특징**: 8개 카테고리 58개 규칙(워터폴 제거, 번들 크기, 서버/클라이언트 성능, 리렌더·렌더링·JS·고급 패턴)
+- **출처**: Vercel Engineering
+
+### ui-ux-pro-max
+
+- **설명**: 웹·모바일 앱을 위한 종합 디자인 가이드. 67개 스타일, 96개 컬러 팔레트, 57개 폰트 페어링, 99개 UX 가이드라인, 13개 기술 스택별 25개 차트 타입을 검색 가능한 DB로 제공합니다.
+- **용도**: UI/UX 디자인, 구축, 리뷰, 개선 요청 시 디자인 시스템 생성 및 우선순위 기반 추천
+- **특징**: `--design-system`으로 디자인 시스템 생성, `--persist`로 MASTER/페이지 오버라이드 저장, Python 스크립트 기반
 
 ### frontend-design
 
@@ -280,35 +307,39 @@ response = client.messages.create(
 ## 📋 Skills 목록 (알파벳 순)
 
 1. algorithmic-art
-2. brainstorming
-3. brand-guidelines
-4. canvas-design
-5. changelog-generator
-6. connect
-7. content-research-writer
-8. developer-growth-analysis
-9. doc-coauthoring
-10. document-skills (docx, pdf, pptx, xlsx)
-11. domain-name-brainstormer
-12. file-organizer
-13. frontend-design
-14. git-pushing
-15. image-enhancer
-16. internal-comms
-17. invoice-organizer
-18. kaizen
-19. lead-research-assistant
-20. mcp-builder
-21. meeting-insights-analyzer
-22. review-implementing
-23. skill-creator
-24. tailored-resume-generator
-25. tapestry
-26. test-fixing
-27. theme-factory
-28. video-downloader
-29. web-artifacts-builder
-30. webapp-testing
+2. beautiful_prose
+3. brainstorming
+4. brand-guidelines
+5. canvas-design
+6. changelog-generator
+7. connect
+8. content-research-writer
+9. developer-growth-analysis
+10. doc-coauthoring
+11. document-skills (docx, pdf, pptx, xlsx)
+12. domain-name-brainstormer
+13. file-organizer
+14. frontend-design
+15. git-pushing
+16. image-enhancer
+17. internal-comms
+18. invoice-organizer
+19. kaizen
+20. lead-research-assistant
+21. mcp-builder
+22. meeting-insights-analyzer
+23. react-best-practices
+24. review-implementing
+25. skill-creator
+26. supabase-postgres-best-practices
+27. tailored-resume-generator
+28. tapestry
+29. test-fixing
+30. theme-factory
+31. ui-ux-pro-max
+32. video-downloader
+33. web-artifacts-builder
+34. webapp-testing
 
 ---
 

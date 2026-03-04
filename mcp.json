@@ -8,6 +8,10 @@
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp@latest"]
     },
+    "rtfmbro": {
+      "type": "http",
+      "url": "https://rtfmbro.smolosoft.dev/mcp/"
+    },
     "serena": {
       "command": "uvx",
       "args": [
