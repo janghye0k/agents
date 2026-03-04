@@ -29,6 +29,16 @@ All files under the effective Memory Bank root: e.g. `tasks.md`, `activeContext.
 
 - **In-file edits (replacements):** Use `serena:replace_content` with `relative_path` as the project-root-relative file path, and `needle` / `repl` / `mode` (literal or regex). Memory Bank files are markdown; do not use symbol-level tools (`replace_symbol_body`, etc.) for these files.
 
+### When Memory Bank is under `.serena/memories`
+
+When the effective Memory Bank root is `.serena/memories/memory-bank`, you **may** use Serena’s memory tools for file-level read/write/edit instead of (or in addition to) the file-based tools above:
+
+- **Read:** Use `read_memory` (e.g. `mcp_serena_read_memory`) with the appropriate memory file name/path for the Memory Bank file you need.
+- **Write (create or overwrite):** Use `write_memory` when creating a new memory file or overwriting an existing one under `.serena/memories`.
+- **Edit (in-place update):** Use `edit_memory` when updating part of an existing memory file (e.g. needle/repl or targeted edits).
+
+Prefer these memory tools when the agent or workflow is already using `.serena/memories` and the target is a Memory Bank file under that path; otherwise continue using `serena:search_for_pattern`, `serena:replace_content`, and the standard Read/Write tools as above.
+
 ## When Serena Has No Tool — Use Standard Tools
 
 - **Creating new files:** Serena does not provide file creation. Use the standard Write (or equivalent) tool to create new files under the Memory Bank root (e.g. initial `tasks.md`, or new files in `creative/`, `reflection/`, `archive/`).
@@ -36,11 +46,11 @@ All files under the effective Memory Bank root: e.g. `tasks.md`, `activeContext.
 
 ## Summary
 
-| Operation       | Prefer                      | Fallback (if needed) |
-| --------------- | --------------------------- | -------------------- |
-| List directory  | `serena:list_dir`           | —                    |
-| Find file       | `serena:find_file`          | —                    |
-| Search/read     | `serena:search_for_pattern` | Read for full file   |
-| Edit content    | `serena:replace_content`    | —                    |
-| Create file     | `serena:create_text_file`   | Write                |
-| Delete file/dir | —                           | Delete               |
+| Operation       | Prefer                      | When under `.serena/memories` | Fallback (if needed) |
+| --------------- | --------------------------- | ----------------------------- | -------------------- |
+| List directory  | `serena:list_dir`           | —                             | —                    |
+| Find file       | `serena:find_file`          | —                             | —                    |
+| Search/read     | `serena:search_for_pattern` | `read_memory`                 | Read for full file   |
+| Edit content    | `serena:replace_content`    | `edit_memory`                 | —                    |
+| Create file     | —                           | `write_memory`                | Write                |
+| Delete file/dir | —                           | —                             | Delete               |
